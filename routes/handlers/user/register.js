@@ -10,7 +10,8 @@ module.exports = async (req, res) => {
       password: 'string|min: 6',
       profession: 'string|optional'
    }
-   const validate = v.validate(req.body, schema);
+   const body = req.body;
+   const validate = v.validate(body, schema);
    if (validate.length) {
       return res.status(400).json({
          status: 'error',
@@ -19,7 +20,7 @@ module.exports = async (req, res) => {
    }
 
    const user = await User.findOne({
-      where: { email: req.body.email }
+      where: { email: body.email }
    });
    if (user) {
       return res.status(409).json({
@@ -28,19 +29,19 @@ module.exports = async (req, res) => {
       })
    }
 
-   const password = await bcrypt.hash(req.body.password, 10);
+   const password = await bcrypt.hash(body.password, 10);
    const data =  {
-      name: req.body.name,
-      email: req.body.email,
+      name: body.name,
+      email: body.email,
       password,
-      profession: req.body.profession,
+      profession: body.profession,
       role: 'student',
-      avatar: req.body.avatar
+      avatar: body.avatar
    }
    const createUser = await User.create(data);
    return res.json({
       status: 'success',
-      message: 'Create account success',
+      message: 'Create account',
       data: {
          id: createUser.id
       }
